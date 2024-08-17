@@ -1,0 +1,60 @@
+items:
+  - item:
+      type: NETHERITE_SWORD
+      amount: 1
+      meta:
+        displayName: '{"text":"Legendary Netherite Sword"}'
+        lore:
+          - '{"text":"A blade of legends"}'
+        enchantments:
+          sharpness: 5
+          unbreaking: 3
+      nbt: '{}'
+    chance: 4.0
+  - item:
+      type: NETHERITE_CHESTPLATE
+      amount: 1
+      meta:
+        displayName: '{"text":"Legendary Netherite Chestplate"}'
+        lore:
+          - '{"text":"Armor of the gods"}'
+        enchantments:
+          protection: 4
+      nbt: '{}'
+    chance: 3.0
+  - item:
+      type: DRAGON_EGG
+      amount: 1
+      meta: {}
+      nbt: '{}'
+    chance: 1.0
+  - item:
+      type: BEACON
+      amount: 1
+      meta: {}
+      nbt: '{}'
+    chance: 2.0
+  - item:
+      type: HEART_OF_THE_SEA
+      amount: 1
+      meta: {}
+      nbt: '{}'
+    chance: 2.0
+  - item:
+      type: ENCHANTED_GOLDEN_APPLE
+      amount: 1
+      meta: {}
+      nbt: '{}'
+    chance: 3.0
+  - item:
+      type: WITHER_SKELETON_SKULL
+      amount: 1
+      meta: {}
+      nbt: '{}'
+    chance: 1.0
+  - item:
+      type: ELYTRA
+      amount: 1
+      meta: {}
+      nbt: '{}'
+    chance: 2.0

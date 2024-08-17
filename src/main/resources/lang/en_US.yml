@@ -1,0 +1,66 @@
+# Base language: English (US)
+# This is the base messages for the plugin.
+# You can create a new language file by copying this file and changing the prefix to the language you want to use.
+# You can also change the messages to your liking.
+# Internal Placeholders are the following:
+# %time% - The time left for the cooldown
+# %amount% - The amount of loot that was received
+# %tier% - The tier of the vault
+# %tier_list% - The list of vault tiers
+# %player% - The player's name
+# %key% - The key that is required to open the vault
+# %loot% - The loot that was received
+# %loot_table% - The loot table that was used
+# %loot_table_list% - The list of loot tables that are available
+# %loot_table_name% - The name of the loot table
+
+vault-reload: "&aThe plugin has been reloaded!"
+vault-on-cooldown: "&cYou are on cooldown for this vault! Please wait %time% before trying again."
+vault-bypass: "&eYou are currently bypassing cooldowns and vault restrictions."
+vault-bypass-status: "&eVault Bypass: %bypass_status%"
+vault-opened: "&aYou have opened the vault! You have received %amount% loot."
+vault-no-key: "&cYou do not have the required key to open this vault!"
+vault-no-permission: "&cYou do not have permission to open this vault!"
+vault-no-loot: "&cThere is no loot in this vault!"
+vault-no-loot-table: "&cThere is no loot table for this vault!"
+vault-tier-list: "&aThe list of vault tiers are: %tier_list%"
+
+vault-hologram:
+  cooldown-format: "&7Cooldown: &c%time%"
+  cooldown-ready: "&7Cooldown: &aReady"
+
+tier-list-format:
+  tier: "&8- %tier%" # Remember the color of the Tier is already colored within the tiers.yml file.
+
+other-format:
+  enabled: "&aEnabled"
+  disabled: "&cDisabled"
+  true: "&aTrue"
+  false: "&cFalse"
+  global: "&aGlobal"
+  per-player: "&aPer Player"
+  none: "&cNone"
+
+
+# GUI Messages
+vault-gui: "&8[&5Vault Hunters&8] &7Vault Builder"
+vault-gui-create: "&aClick to create a new vault tier!"
+vault-gui-create-exists: "&cA vault tier with this name already exists!"
+vault-gui-cancel-creation: "&cCanceled the creation of the vault tier!"
+vault-gui-edit: "&aClick to edit a vault tier!"
+vault-gui-delete: "&cClick to delete a vault tier!"
+vault-gui-back: "&cClick to go back!"
+vault-gui-save: "&aClick to save the vault tier!"
+vault-gui-cancel: "&cClick to cancel the vault tier!"
+vault-gui-edit-hologram: "&aClick to edit the hologram!"
+vault-gui-add-loot: "&aClick to add loot to the vault tier!"
+vault-gui-remove-loot: "&cClick to remove loot from the vault tier!"
+vault-gui-loot-table: "&aClick to change the loot table!"
+vault-gui-loot-table-list: "&aClick to view the loot table list!"
+vault-gui-created-vault: "&aYou have created a new vault tier! [Tier: %tier%]"
+vault-gui-added-loot: "&aYou have added loot to the vault tier!"
+vault-gui-removed-loot: "&cYou have removed loot from the vault tier!"
+
+# Item Editor Messages
+item-editor-save: "&aSuccessfully changed the item chance!"
+item-editor-invalid-chance: "&cInvalid chance! Please enter a number between 1.0 and 100.0"

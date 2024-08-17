@@ -1,0 +1,38 @@
+
+prefix: "&8[&5Vault Hunters&8] &7"
+lang: "en_US" # The language file that will be used for the plugin
+
+vaults:
+  cooldown-time: "1d" # You can use the following time units: s(Seconds), m(Mins), h(Hours), d(Days), w(Weeks), M(Months), y(Years)
+  cooldown-type: "PER_PLAYER" # PER_PLAYER or GLOBAL
+  vault-key: "TRIAL_KEY" # The item that will be used to open the vault
+  hologram: # Enable this to enable holograms to show above the vault.
+    enabled: true
+    hover_name: "%tier_name% &7Vault"
+    above-vault: 1.5
+    show-cooldown: true
+
+options:
+  looting-radius: "10" # The radius in which players will be detected to prevent loot camping
+  loot-amount: 5 # The amount of loot that will be dropped
+  randomize-loot: true # Randomize the loot that will be dropped
+  random-loot-tables: # This will randomize the loot tables that will be used for every vault. If you want to use a specific loot table, use the in-game editor.
+    enabled: false
+    loot-tables:
+      - Common
+      - Uncommon
+      - Rare
+      - Epic
+      - Legendary
+      - Mythic
+      - Godly
+  particles:
+    enabled: true
+    praticle-list: # The particle(s) that will be shown when a vault is opened (Particle:Amount) - You can find the list of particles here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Particle.html
+      - "SPELL_MOB:10"
+    loop: "10" # The amount of times the particles will loop
+    loop-delay: "1" # The delay in seconds between each loop
+  sound:
+    enabled: true
+    sound-list: # The sound(s) that will be played when a vault is opened (Sound:Volume:Pitch) - You can find the list of sounds here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Sound.html
+      - "ENTITY_PLAYER_LEVELUP:1:1"

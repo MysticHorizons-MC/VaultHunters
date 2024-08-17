@@ -1,0 +1,67 @@
+items:
+  - item:
+      type: NETHERITE_SWORD
+      amount: 1
+      meta:
+        displayName: '{"text":"Godly Netherite Sword"}'
+        lore:
+          - '{"text":"A sword blessed by the gods"}'
+        enchantments:
+          sharpness: 5
+          fire_aspect: 2
+          unbreaking: 3
+      nbt: '{"CustomTag":"GodlyWeapon"}'
+    chance: 2.0
+  - item:
+      type: NETHERITE_CHESTPLATE
+      amount: 1
+      meta:
+        displayName: '{"text":"Godly Netherite Chestplate"}'
+        lore:
+          - '{"text":"Armor of divine protection"}'
+        enchantments:
+          protection: 4
+          unbreaking: 3
+      nbt: '{"CustomTag":"GodlyArmor"}'
+    chance: 2.0
+  - item:
+      type: DRAGON_EGG
+      amount: 1
+      meta:
+        displayName: '{"text":"Egg of the Ender Dragon"}'
+      nbt: '{}'
+    chance: 1.0
+  - item:
+      type: NETHER_STAR
+      amount: 1
+      meta:
+        displayName: '{"text":"Star of the Nether"}'
+      nbt: '{}'
+    chance: 1.0
+  - item:
+      type: TOTEM_OF_UNDYING
+      amount: 1
+      meta: {}
+      nbt: '{}'
+    chance: 1.5
+  - item:
+      type: ENCHANTED_GOLDEN_APPLE
+      amount: 2
+      meta:
+        displayName: '{"text":"Godly Golden Apple"}'
+      nbt: '{}'
+    chance: 1.0
+  - item:
+      type: ELYTRA
+      amount: 1
+      meta:
+        displayName: '{"text":"Wings of the Gods"}'
+      nbt: '{}'
+    chance: 1.0
+  - item:
+      type: BEACON
+      amount: 1
+      meta:
+        displayName: '{"text":"Beacon of Power"}'
+      nbt: '{}'
+    chance: 1.0

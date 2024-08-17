@@ -1,0 +1,59 @@
+items:
+  - item:
+      type: IRON_INGOT
+      amount: 5
+      meta: {}
+      nbt: '{}'
+    chance: 15.0
+  - item:
+      type: OAK_SAPLING
+      amount: 5
+      meta: {}
+      nbt: '{}'
+    chance: 10.0
+  - item:
+      type: IRON_SWORD
+      amount: 1
+      meta:
+        displayName: '{"text":"Uncommon Iron Sword"}'
+        lore:
+          - '{"text":"A better sword for a better fighter"}'
+        enchantments:
+          sharpness: 1
+      nbt: '{}'
+    chance: 5.0
+  - item:
+      type: IRON_BOOTS
+      amount: 1
+      meta:
+        displayName: '{"text":"Uncommon Iron Boots"}'
+        lore:
+          - '{"text":"Solid iron boots for adventurers"}'
+      nbt: '{}'
+    chance: 7.0
+  - item:
+      type: SHIELD
+      amount: 1
+      meta: {}
+      nbt: '{}'
+    chance: 5.0
+  - item:
+      type: FISHING_ROD
+      amount: 1
+      meta: {}
+      nbt: '{}'
+    chance: 5.0
+  - item:
+      type: STRING
+      amount: 6
+      meta: {}
+      nbt: '{}'
+    chance: 3.0
+  - item:
+      type: BOW
+      amount: 1
+      meta:
+        enchantments:
+          unbreaking: 1
+      nbt: '{}'
+    chance: 5.0

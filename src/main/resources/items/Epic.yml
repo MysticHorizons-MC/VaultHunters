@@ -1,0 +1,60 @@
+items:
+  - item:
+      type: DIAMOND_SWORD
+      amount: 1
+      meta:
+        displayName: '{"text":"Epic Diamond Sword"}'
+        lore:
+          - '{"text":"A sword worthy of a hero"}'
+        enchantments:
+          sharpness: 3
+          unbreaking: 2
+      nbt: '{}'
+    chance: 5.0
+  - item:
+      type: DIAMOND_HELMET
+      amount: 1
+      meta:
+        displayName: '{"text":"Epic Diamond Helmet"}'
+        lore:
+          - '{"text":"A helmet that shines with brilliance"}'
+        enchantments:
+          protection: 3
+      nbt: '{}'
+    chance: 4.0
+  - item:
+      type: NETHERITE_INGOT
+      amount: 1
+      meta: {}
+      nbt: '{}'
+    chance: 3.0
+  - item:
+      type: TOTEM_OF_UNDYING
+      amount: 1
+      meta: {}
+      nbt: '{}'
+    chance: 2.0
+  - item:
+      type: ENCHANTED_GOLDEN_APPLE
+      amount: 1
+      meta: {}
+      nbt: '{}'
+    chance: 1.0
+  - item:
+      type: ELYTRA
+      amount: 1
+      meta: {}
+      nbt: '{}'
+    chance: 1.0
+  - item:
+      type: ANCIENT_DEBRIS
+      amount: 2
+      meta: {}
+      nbt: '{}'
+    chance: 2.0
+  - item:
+      type: SHULKER_SHELL
+      amount: 2
+      meta: {}
+      nbt: '{}'
+    chance: 3.0

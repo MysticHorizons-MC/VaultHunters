@@ -1,0 +1,56 @@
+items:
+  - item:
+      type: GOLD_INGOT
+      amount: 3
+      meta: {}
+      nbt: '{}'
+    chance: 12.0
+  - item:
+      type: DIAMOND
+      amount: 1
+      meta: {}
+      nbt: '{}'
+    chance: 5.0
+  - item:
+      type: ENCHANTED_BOOK
+      amount: 1
+      meta:
+        enchantments:
+          efficiency: 2
+      nbt: '{}'
+    chance: 3.0
+  - item:
+      type: IRON_CHESTPLATE
+      amount: 1
+      meta:
+        displayName: '{"text":"Rare Iron Chestplate"}'
+        lore:
+          - '{"text":"A sturdy iron chestplate"}'
+        enchantments:
+          protection: 2
+      nbt: '{}'
+    chance: 7.0
+  - item:
+      type: GOLDEN_APPLE
+      amount: 1
+      meta: {}
+      nbt: '{}'
+    chance: 4.0
+  - item:
+      type: OBSIDIAN
+      amount: 4
+      meta: {}
+      nbt: '{}'
+    chance: 5.0
+  - item:
+      type: BLAZE_ROD
+      amount: 2
+      meta: {}
+      nbt: '{}'
+    chance: 3.0
+  - item:
+      type: ENDER_PEARL
+      amount: 2
+      meta: {}
+      nbt: '{}'
+    chance: 4.0

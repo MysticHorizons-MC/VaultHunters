@@ -1,0 +1,36 @@
+tiers:
+  Common:
+    name: "&eCommon"
+    file: "Common.yml"
+    chance: 50%
+    number_of_items: 5-10
+  Uncommon:
+    name: "&aUncommon"
+    file: "Uncommon.yml"
+    chance: 30%
+    number_of_items: 2-6
+  Rare:
+    name: "&9Rare"
+    file: "Rare.yml"
+    chance: 15%
+    number_of_items: 1-3
+  Epic:
+    name: "&5Epic"
+    file: "Epic.yml"
+    chance: 3%
+    number_of_items: 1-2
+  Legendary:
+    name: "&6Legendary"
+    file: "Legendary.yml"
+    chance: 1%
+    number_of_items: 1
+  Mythic:
+    name: "&dMythic"
+    file: "Mythic.yml"
+    chance: 0.5%
+    number_of_items: 1
+  Godly:
+    name: "&4Godly"
+    file: "Godly.yml"
+    chance: 0.1%
+    number_of_items: 1

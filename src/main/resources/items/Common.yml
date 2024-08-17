@@ -1,0 +1,55 @@
+items:
+  - item:
+      type: DIRT
+      amount: 16
+      meta: {}
+      nbt: '{}'
+    chance: 20.0
+  - item:
+      type: COBBLESTONE
+      amount: 16
+      meta: {}
+      nbt: '{}'
+    chance: 20.0
+  - item:
+      type: OAK_LOG
+      amount: 8
+      meta: {}
+      nbt: '{}'
+    chance: 10.0
+  - item:
+      type: STONE_SWORD
+      amount: 1
+      meta:
+        displayName: '{"text":"Stone Sword"}'
+      nbt: '{}'
+    chance: 5.0
+  - item:
+      type: BREAD
+      amount: 3
+      meta: {}
+      nbt: '{}'
+    chance: 8.0
+  - item:
+      type: LEATHER_HELMET
+      amount: 1
+      meta:
+        displayName: '{"text":"Common Helmet"}'
+        lore:
+          - '{"text":"A simple leather helmet"}'
+        enchantments:
+          protection: 1
+      nbt: '{}'
+    chance: 3.0
+  - item:
+      type: COAL
+      amount: 4
+      meta: {}
+      nbt: '{}'
+    chance: 5.0
+  - item:
+      type: TORCH
+      amount: 8
+      meta: {}
+      nbt: '{}'
+    chance: 5.0

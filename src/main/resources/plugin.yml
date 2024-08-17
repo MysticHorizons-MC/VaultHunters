@@ -1,0 +1,30 @@
+name: VaultHunters
+version: '${project.version}'
+main: org.mystichorizons.vaultHunters.VaultHunters
+api-version: '1.21'
+authors: [ Alphine ]
+description: Allows you to modify how Vaults work in 1.21+ and allows you to add other loot using NBT Data.
+website: https://mystichorizons.net
+softdepend: [ DecentHolograms, NBTAPI ]
+commands:
+  vaulthunters:
+    description: Main command for VaultHunters plugin.
+    usage: /<command> [info/reload/gui/bypass]
+    permission: vaulthunters.use
+    aliases: [ vh ]
+permissions:
+  vaulthunters.use:
+    description: Allows access to the /vaulthunters command
+    default: true
+  vaulthunters.info:
+    description: Allows the user to view plugin information
+    default: true
+  vaulthunters.reload:
+    description: Allows the user to reload the plugin configuration
+    default: op
+  vaulthunters.gui:
+    description: Allows the user to open the VaultHunters GUI
+    default: op
+  vaulthunters.bypass:
+    description: Allows the user to toggle bypass mode
+    default: op
