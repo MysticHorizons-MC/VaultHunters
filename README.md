@@ -9,12 +9,17 @@ VaultHunters is a Minecraft plugin designed for version 1.21 and above. It allow
 - **Dynamic Loot Injection:** Inject loot into Vaults based on predefined configurations and randomization.
 - **Hologram Support:** Display the current loot tier above the Vaults using holograms.
 - **Cooldown System:** Set cooldowns for Vaults to control when new loot can be injected.
+- **NBTAPI Embedded:** VaultHunters already embeds the `NBTAPI` library, eliminating the need for additional dependencies.
 
 ## Prerequisites
 
 - **Minecraft Server:** Version 1.21 or higher.
 - **Java:** JDK 17 or higher.
 - **Maven:** For building the plugin.
+
+## Optional Dependencies
+
+- **DecentHologram:** For displaying holograms above Vaults.
 
 ## Installation
 
