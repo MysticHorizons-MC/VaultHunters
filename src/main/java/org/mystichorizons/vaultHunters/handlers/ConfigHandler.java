@@ -70,10 +70,6 @@ public class ConfigHandler {
         return config.getString("vaults.cooldown-type", "PER_PLAYER");
     }
 
-    public String getVaultKey() {
-        return config.getString("vaults.vault-key", "TRIAL_KEY");
-    }
-
     public boolean isHologramEnabled() {
         return config.getBoolean("vaults.hologram.enabled", true);
     }

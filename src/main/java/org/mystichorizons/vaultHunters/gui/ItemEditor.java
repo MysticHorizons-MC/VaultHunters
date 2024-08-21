@@ -11,6 +11,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.mystichorizons.vaultHunters.VaultHunters;
 import org.mystichorizons.vaultHunters.handlers.LangHandler;
+import org.mystichorizons.vaultHunters.handlers.TierItemsHandler;
+import org.mystichorizons.vaultHunters.tables.LootItem;
 
 public class ItemEditor extends GUIManager {
 
@@ -24,11 +26,12 @@ public class ItemEditor extends GUIManager {
         this.langHandler = plugin.getLangHandler();
         this.itemToEdit = itemToEdit;
         this.tierName = tierName;
-        this.itemIndex = plugin.getTierItemsHandler().getTierItems(tierName).indexOf(
-                plugin.getTierItemsHandler().getTierItems(tierName).stream()
-                        .filter(tierItem -> tierItem.getItemStack().isSimilar(itemToEdit))
-                        .findFirst()
-                        .orElse(null)
+        this.itemIndex = findItemIndex();
+    }
+
+    private int findItemIndex() {
+        return plugin.getTierItemsHandler().getLootTableItems().indexOf(
+                plugin.getTierItemsHandler().getItem(itemToEdit)
         );
     }
 
@@ -42,7 +45,7 @@ public class ItemEditor extends GUIManager {
         Inventory anvil = Bukkit.createInventory(null, InventoryType.ANVIL, langHandler.getMessage("item-editor-title"));
 
         // Get the current chance of the item in the vault tier
-        double currentChance = plugin.getTierItemsHandler().getTierItems(tierName).get(itemIndex).getChance();
+        double currentChance = plugin.getTierItemsHandler().getLootTableItems().get(itemIndex).getChance();
 
         // Create a paper item with the current chance as its display name
         ItemStack paper = new ItemStack(Material.PAPER);
@@ -70,7 +73,8 @@ public class ItemEditor extends GUIManager {
                     double newChance = Double.parseDouble(displayName);
 
                     // Update the item's chance in the vault tier
-                    plugin.getTierItemsHandler().editTierItem(tierName, itemIndex, itemToEdit, newChance);
+                    LootItem lootItem = plugin.getTierItemsHandler().getLootTableItems().get(itemIndex);
+                    plugin.getTierItemsHandler().addLootItem(lootItem.getItem(), newChance, lootItem.getMinQuantity(), lootItem.getMaxQuantity());
                     event.getWhoClicked().sendMessage(langHandler.getMessage("item-editor-save"));
                 } catch (NumberFormatException e) {
                     event.getWhoClicked().sendMessage(langHandler.getMessage("item-editor-invalid-chance"));

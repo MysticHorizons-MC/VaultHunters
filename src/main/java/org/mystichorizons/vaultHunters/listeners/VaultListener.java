@@ -27,7 +27,7 @@ public class VaultListener implements Listener {
         this.plugin = plugin;
         this.vaultLootInjector = new VaultLootInjector(plugin,
                 plugin.getVaultTiersHandler(),
-                plugin.getTierItemsHandler(),
+                plugin.getParticleHandler(),
                 plugin.getHologramHandler());
         this.playerCooldowns = new HashMap<>();
         this.globalCooldowns = new HashMap<>();
@@ -52,13 +52,15 @@ public class VaultListener implements Listener {
         VaultBlock vaultBlock = new VaultBlock(block); // Create a VaultBlock instance
         ItemStack keyItem = player.getInventory().getItemInMainHand(); // Get the item in the player's hand
 
-        // Check if the key is valid and handle the interaction
+        // Check if the key is valid using the VaultBlock class
         if (vaultBlock.isValidKey(keyItem, Material.TRIAL_KEY, Material.OMINOUS_TRIAL_KEY)) {
-            vaultBlock.handleVaultBlockInteraction(null, keyItem, Material.TRIAL_KEY, Material.OMINOUS_TRIAL_KEY);
+            // If the key is valid, proceed to inject loot and handle the interaction
+            boolean lootInjected = vaultLootInjector.injectRandomTierLoot(vaultBlock, player, keyItem, Material.TRIAL_KEY, Material.OMINOUS_TRIAL_KEY);
 
-            // If valid, perform the vault block interaction
-            if (vaultLootInjector.injectRandomTierLoot(block, player)) {
+            if (lootInjected) {
                 handleCooldown(player, block);
+            } else {
+                player.sendMessage("Failed to inject loot into the vault.");
             }
         } else {
             // Handle invalid key interaction

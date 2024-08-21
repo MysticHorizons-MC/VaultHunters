@@ -2,13 +2,17 @@ package org.mystichorizons.vaultHunters.handlers;
 
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.mystichorizons.vaultHunters.tables.LootItem;
+import org.mystichorizons.vaultHunters.tables.LootTable;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+
+import static org.mystichorizons.vaultHunters.util.ItemStackSerializer.deserializeItemStack;
+import static org.mystichorizons.vaultHunters.util.ItemStackSerializer.serializeItemStack;
 
 public class VaultTiersHandler {
 
@@ -39,7 +43,10 @@ public class VaultTiersHandler {
             double chance = config.getDouble(tierPath + ".chance", 0.0);
             String numberOfItems = config.getString(tierPath + ".number_of_items", "1-1");
 
-            VaultTier tier = new VaultTier(name, file, chance, numberOfItems);
+            // Load the associated LootTable from the file
+            LootTable lootTable = loadLootTable(file);
+
+            VaultTier tier = new VaultTier(name, file, chance, numberOfItems, lootTable);
             vaultTiers.put(key.toLowerCase(), tier);
         }
     }
@@ -54,13 +61,57 @@ public class VaultTiersHandler {
             config.set(tierPath + ".file", tier.getFile());
             config.set(tierPath + ".chance", tier.getChance());
             config.set(tierPath + ".number_of_items", tier.getNumberOfItems());
+
+            // Save the associated LootTable to its file
+            saveLootTable(tier.getFile(), tier.getLootTable());
         }
         saveConfigFile();
     }
 
+    // Load a LootTable from the specified file
+    public LootTable loadLootTable(String fileName) {
+        File file = new File(plugin.getDataFolder(), "items/" + fileName);
+        LootTable lootTable = new LootTable();
+        if (file.exists()) {
+            FileConfiguration lootConfig = YamlConfiguration.loadConfiguration(file);
+            List<Map<String, Object>> itemMaps = (List<Map<String, Object>>) lootConfig.getList("items");
+            if (itemMaps != null) {
+                for (Map<String, Object> itemMap : itemMaps) {
+                    ItemStack itemStack = deserializeItemStack((Map<String, Object>) itemMap.get("item"));
+                    double chance = (double) itemMap.getOrDefault("chance", 1.0);
+                    int minQuantity = (int) itemMap.getOrDefault("minQuantity", 1);
+                    int maxQuantity = (int) itemMap.getOrDefault("maxQuantity", 1);
+                    lootTable.addLootItem(new LootItem(itemStack, chance, minQuantity, maxQuantity));
+                }
+            }
+        }
+        return lootTable;
+    }
+
+    // Save a LootTable to the specified file
+    public void saveLootTable(String fileName, LootTable lootTable) {
+        File file = new File(plugin.getDataFolder(), "items/" + fileName);
+        YamlConfiguration lootConfig = new YamlConfiguration();
+        List<Map<String, Object>> itemMaps = new ArrayList<>();
+        for (LootItem lootItem : lootTable.getLootItems()) {
+            Map<String, Object> itemMap = serializeItemStack(lootItem.getItem());
+            itemMap.put("chance", lootItem.getChance());
+            itemMap.put("minQuantity", lootItem.getMinQuantity());
+            itemMap.put("maxQuantity", lootItem.getMaxQuantity());
+            itemMaps.add(itemMap);
+        }
+        lootConfig.set("items", itemMaps);
+        try {
+            lootConfig.save(file);
+        } catch (IOException e) {
+            plugin.getLogger().severe("Could not save loot table file: " + fileName);
+            e.printStackTrace();
+        }
+    }
+
     // Get a vault tier by name
     public VaultTier getTier(String tierName) {
-        return vaultTiers.getOrDefault(tierName.toLowerCase(), new VaultTier("&eCommon", "Common.yml", 50.0, "5-10"));
+        return vaultTiers.getOrDefault(tierName.toLowerCase(), new VaultTier("&eCommon", "Common.yml", 50.0, "5-10", new LootTable()));
     }
 
     // Get all vault tier names
@@ -84,7 +135,7 @@ public class VaultTiersHandler {
         if (vaultTierExists(lowerCaseTierName)) {
             throw new IllegalArgumentException("Vault tier with this name already exists!");
         }
-        VaultTier newTier = new VaultTier("&e" + tierName, tierName + ".yml", 0.0, "1-1");
+        VaultTier newTier = new VaultTier("&e" + tierName, tierName + ".yml", 0.0, "1-1", new LootTable());
         vaultTiers.put(lowerCaseTierName, newTier);
         saveVaultTiers();
     }
@@ -123,7 +174,7 @@ public class VaultTiersHandler {
                 return tier;
             }
         }
-        return vaultTiers.getOrDefault("common", new VaultTier("&eCommon", "Common.yml", 50.0, "5-10")); // Default to "Common"
+        return vaultTiers.getOrDefault("common", new VaultTier("&eCommon", "Common.yml", 50.0, "5-10", new LootTable())); // Default to "Common"
     }
 
     // Save a specific tier
@@ -135,6 +186,7 @@ public class VaultTiersHandler {
             config.set(tierPath + ".file", tier.getFile());
             config.set(tierPath + ".chance", tier.getChance());
             config.set(tierPath + ".number_of_items", tier.getNumberOfItems());
+            saveLootTable(tier.getFile(), tier.getLootTable());
             saveConfigFile();
         } else {
             plugin.getLogger().warning("Attempted to save non-existent tier: " + tierName);
@@ -157,12 +209,14 @@ public class VaultTiersHandler {
         private final String file;
         private final double chance;
         private final String numberOfItems;
+        private final LootTable lootTable;
 
-        public VaultTier(String name, String file, double chance, String numberOfItems) {
+        public VaultTier(String name, String file, double chance, String numberOfItems, LootTable lootTable) {
             this.name = name;
             this.file = file;
             this.chance = chance;
             this.numberOfItems = numberOfItems;
+            this.lootTable = lootTable;
         }
 
         public String getName() {
@@ -189,6 +243,10 @@ public class VaultTiersHandler {
         public int getMaxItems() {
             String[] range = numberOfItems.split("-");
             return Integer.parseInt(range[1]);
+        }
+
+        public LootTable getLootTable() {
+            return lootTable;
         }
     }
 }

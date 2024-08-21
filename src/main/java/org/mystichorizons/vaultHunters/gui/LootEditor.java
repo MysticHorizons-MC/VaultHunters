@@ -15,6 +15,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.mystichorizons.vaultHunters.VaultHunters;
 import org.mystichorizons.vaultHunters.handlers.LangHandler;
 import org.mystichorizons.vaultHunters.handlers.TierItemsHandler;
+import org.mystichorizons.vaultHunters.tables.LootItem;
 
 import java.util.Arrays;
 import java.util.List;
@@ -40,12 +41,12 @@ public class LootEditor extends GUIManager {
         }
         lootEditor.setItem(53, createSaveButton());
 
-        TierItemsHandler.TierItem[] items = plugin.getTierItemsHandler().getTierItems(tierName).toArray(new TierItemsHandler.TierItem[0]);
-        for (int i = 0; i < items.length && i < 45; i++) {
-            ItemStack item = items[i].getItemStack();
+        List<LootItem> items = plugin.getTierItemsHandler().getLootTableItems();
+        for (int i = 0; i < items.size() && i < 45; i++) {
+            ItemStack item = items.get(i).getItem();
             ItemMeta meta = item.getItemMeta();
             if (meta != null) {
-                meta.setLore(Arrays.asList(ChatColor.GRAY + "Chance: " + items[i].getChance() + "%"));
+                meta.setLore(Arrays.asList(ChatColor.GRAY + "Chance: " + items.get(i).getChance() + "%"));
                 item.setItemMeta(meta);
             }
             lootEditor.setItem(i, item);
@@ -85,6 +86,7 @@ public class LootEditor extends GUIManager {
         if (slot < 45) {
             handleItemEdit(event, player, tierName, clickedItem, slot);
         } else if (slot == 53 && clickedItem != null && clickedItem.getType() == Material.GREEN_WOOL) {
+            saveLootChanges(player, tierName, event.getInventory());
             player.closeInventory();
             player.sendMessage(langHandler.getMessage("vault-gui-save"));
         }
@@ -94,13 +96,13 @@ public class LootEditor extends GUIManager {
         if (event.getClick() == ClickType.RIGHT && clickedItem != null && clickedItem.getType() != Material.AIR) {
             new ItemEditor(plugin, clickedItem, tierName).openItemEditor(player);
         } else if (clickedItem != null && clickedItem.getType() != Material.AIR) {
-            plugin.getTierItemsHandler().removeItemFromTier(tierName, clickedItem);
+            plugin.getTierItemsHandler().removeLootItem(clickedItem);
             player.sendMessage(langHandler.getMessage("vault-gui-removed-loot"));
             event.getView().setItem(slot, null);
         } else if (clickedItem == null || clickedItem.getType() == Material.AIR) {
             ItemStack cursorItem = event.getCursor();
             if (cursorItem != null && cursorItem.getType() != Material.AIR) {
-                plugin.getTierItemsHandler().addItemToTier(tierName, cursorItem.clone(), 1.0);
+                plugin.getTierItemsHandler().addLootItem(cursorItem.clone(), 1.0, 1, 1);
                 player.sendMessage(langHandler.getMessage("vault-gui-added-loot"));
                 event.getView().setItem(slot, cursorItem.clone());
                 event.getWhoClicked().setItemOnCursor(null);
@@ -108,24 +110,27 @@ public class LootEditor extends GUIManager {
         }
     }
 
+    @EventHandler
     public void handleInventoryClose(InventoryCloseEvent event, String tierName) {
-        InventoryView view = event.getView();
-        saveInventoryState(view, tierName);
+        saveLootChanges((Player) event.getPlayer(), tierName, event.getInventory());
     }
 
-    private void saveInventoryState(InventoryView view, String tierName) {
-        List<TierItemsHandler.TierItem> items = new ArrayList<>();
+    private void saveLootChanges(Player player, String tierName, Inventory inventory) {
+        List<LootItem> items = new ArrayList<>();
         for (int i = 0; i < 45; i++) {
-            ItemStack item = view.getItem(i);
+            ItemStack item = inventory.getItem(i);
             if (item != null && item.getType() != Material.AIR) {
-                double currentChance = plugin.getTierItemsHandler().getTierItems(tierName).stream()
-                        .filter(tierItem -> tierItem.getItemStack().isSimilar(item))
+                double currentChance = plugin.getTierItemsHandler().getLootTableItems().stream()
+                        .filter(lootItem -> lootItem.getItem().isSimilar(item))
                         .findFirst()
-                        .map(TierItemsHandler.TierItem::getChance)
+                        .map(LootItem::getChance)
                         .orElse(1.0);
-                items.add(new TierItemsHandler.TierItem(item, currentChance));
+                items.add(new LootItem(item, currentChance, 1, 1));
             }
         }
-        plugin.getTierItemsHandler().saveTierItems(tierName, items);
+        plugin.getTierItemsHandler().clearLootTable();
+        items.forEach(lootItem -> plugin.getTierItemsHandler().addLootItem(lootItem.getItem(), lootItem.getChance(), lootItem.getMinQuantity(), lootItem.getMaxQuantity()));
+        plugin.getTierItemsHandler().saveLootTable(tierName);
+        player.sendMessage(langHandler.getMessage("vault-gui-save-success"));
     }
 }

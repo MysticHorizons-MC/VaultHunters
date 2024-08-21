@@ -14,10 +14,11 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.NamespacedKey;
 import org.mystichorizons.vaultHunters.VaultHunters;
 import org.mystichorizons.vaultHunters.handlers.HologramHandler;
-import org.mystichorizons.vaultHunters.handlers.TierItemsHandler;
+import org.mystichorizons.vaultHunters.handlers.ParticleHandler;
 import org.mystichorizons.vaultHunters.handlers.VaultTiersHandler;
 import org.mystichorizons.vaultHunters.tables.LootItem;
 import org.mystichorizons.vaultHunters.tables.LootTable;
+import org.mystichorizons.vaultHunters.tables.VaultBlock;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,15 +28,15 @@ public class VaultLootInjector {
 
     private final VaultHunters plugin;
     private final VaultTiersHandler vaultTiersHandler;
-    private final TierItemsHandler tierItemsHandler;
+    private final ParticleHandler particleHandler;
     private final HologramHandler hologramHandler;
     private final Map<UUID, Long> playerCooldowns;
-    private final NamespacedKey tierKey;  // Added the NamespacedKey for persistent data
+    private final NamespacedKey tierKey;
 
-    public VaultLootInjector(VaultHunters plugin, VaultTiersHandler vaultTiersHandler, TierItemsHandler tierItemsHandler, HologramHandler hologramHandler) {
+    public VaultLootInjector(VaultHunters plugin, VaultTiersHandler vaultTiersHandler, ParticleHandler particleHandler, HologramHandler hologramHandler) {
         this.plugin = plugin;
         this.vaultTiersHandler = vaultTiersHandler;
-        this.tierItemsHandler = tierItemsHandler;
+        this.particleHandler = particleHandler;
         this.hologramHandler = hologramHandler;
         this.playerCooldowns = new HashMap<>();
         this.tierKey = new NamespacedKey(plugin, "vault_tier");
@@ -53,21 +54,27 @@ public class VaultLootInjector {
         }
     }
 
-    public boolean injectRandomTierLoot(Block vaultBlock, Player player) {
+    public boolean injectRandomTierLoot(VaultBlock vaultBlock, Player player, ItemStack key, Material trialKeyMaterial, Material ominousTrialKeyMaterial) {
         UUID playerId = player.getUniqueId();
 
+        // Validate the key using VaultBlock
+        if (!vaultBlock.isValidKey(key, trialKeyMaterial, ominousTrialKeyMaterial)) {
+            player.sendMessage("Invalid key used! You cannot loot this vault.");
+            return false;
+        }
+
         // Determine the current tier of the vault, if any
-        VaultTiersHandler.VaultTier currentTier = getCurrentVaultTier(vaultBlock);
+        VaultTiersHandler.VaultTier currentTier = getCurrentVaultTier(vaultBlock.getBlock());
 
         // If no current tier is found, or we want to randomly assign a new tier, get a new random tier
         VaultTiersHandler.VaultTier newTier = (currentTier != null) ? currentTier : vaultTiersHandler.getRandomTier();
 
         if (newTier != null) {
             // Assign the new tier to the vault block
-            assignTierToVault(vaultBlock, newTier);
+            assignTierToVault(vaultBlock.getBlock(), newTier);
 
             // Check if the player is still on cooldown
-            if (isOnCooldown(playerId, vaultBlock)) {
+            if (isOnCooldown(playerId, vaultBlock.getBlock())) {
                 player.sendMessage("You cannot loot this vault yet. Please wait for the cooldown to expire.");
                 return false;
             }
@@ -76,21 +83,22 @@ public class VaultLootInjector {
             LootTable lootTable = createLootTableForTier(newTier);
             List<ItemStack> lootItems = lootTable.generateLoot();
 
-            if (vaultBlock.getState() instanceof Lootable) {
-                lootItems.forEach(item -> vaultBlock.getWorld().dropItemNaturally(vaultBlock.getLocation(), item));
+            if (vaultBlock.getBlock().getState() instanceof Lootable) {
+                lootItems.forEach(item -> vaultBlock.getBlock().getWorld().dropItemNaturally(vaultBlock.getBlock().getLocation(), item));
+                setVaultState(vaultBlock.getBlock(), Vault.State.EJECTING);
             } else {
                 plugin.getLogger().warning("Vault block is not lootable or does not support loot tables.");
                 return false;
             }
 
             // Update the hologram to show the new tier
-            updateHologram(vaultBlock, newTier.getName());
+            updateHologram(vaultBlock.getBlock(), newTier.getName());
 
             // Set the block state to INACTIVE after ejection
-            setVaultState(vaultBlock, Vault.State.INACTIVE);
+            setVaultState(vaultBlock.getBlock(), Vault.State.INACTIVE);
 
             // Record the cooldown and start the cooldown process
-            startCooldown(vaultBlock, playerId, newTier);
+            startCooldown(vaultBlock.getBlock(), playerId, newTier);
 
             return true;
         } else {
@@ -101,10 +109,10 @@ public class VaultLootInjector {
 
     private LootTable createLootTableForTier(VaultTiersHandler.VaultTier tier) {
         LootTable lootTable = new LootTable();
-        List<TierItemsHandler.TierItem> tierItems = tierItemsHandler.getTierItems(tier.getName());
+        List<LootItem> tierItems = (List<LootItem>) vaultTiersHandler.loadLootTable(tier.getName());
 
-        for (TierItemsHandler.TierItem tierItem : tierItems) {
-            lootTable.addLootItem(new LootItem(tierItem.getItemStack(), tierItem.getChance(), tier.getMinItems(), tier.getMaxItems())); // Adjust min/max quantities based on tier
+        for (LootItem tierItem : tierItems) {
+            lootTable.addLootItem(new LootItem(tierItem.getItem(), tierItem.getChance(), tierItem.getMinQuantity(), tierItem.getMaxQuantity()));
         }
 
         return lootTable;
@@ -149,7 +157,10 @@ public class VaultLootInjector {
 
                 // Inject new loot tier (if player is near)
                 if (isPlayerNearVault(vaultBlock, playerId)) {
-                    injectRandomTierLoot(vaultBlock, plugin.getServer().getPlayer(playerId));
+                    Player nearbyPlayer = plugin.getServer().getPlayer(playerId);
+                    if (nearbyPlayer != null) {
+                        injectRandomTierLoot(new VaultBlock(vaultBlock), nearbyPlayer, nearbyPlayer.getInventory().getItemInMainHand(), Material.TRIAL_KEY, Material.OMINOUS_TRIAL_KEY);
+                    }
                 }
             }
         }.runTaskLater(plugin, cooldownTimeMillis / 50); // Convert milliseconds to ticks

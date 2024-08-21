@@ -24,6 +24,7 @@ public final class VaultHunters extends JavaPlugin {
     private PlayerDataManager playerDataManager;
     private VaultTask vaultTask;
     private GUIManager guiManager;
+    private ParticleHandler particleHandler; // Added ParticleHandler as an instance variable
 
     @Override
     public void onEnable() {
@@ -44,9 +45,10 @@ public final class VaultHunters extends JavaPlugin {
         // Initialize other handlers
         this.vaultTiersHandler = new VaultTiersHandler(this);
         this.tierItemsHandler = new TierItemsHandler(this);
-        this.hologramHandler = new HologramHandler(this, langHandler);
+        this.hologramHandler = new HologramHandler(this, langHandler, configHandler);
         this.playerDataManager = new PlayerDataManager();
         this.guiManager = new GUIManager(this);
+        this.particleHandler = new ParticleHandler(configHandler); // Initialize the ParticleHandler
 
         // Register commands
         registerCommands();
@@ -68,7 +70,6 @@ public final class VaultHunters extends JavaPlugin {
     public void onDisable() {
         // Perform any necessary cleanup
         sendConsoleMessage(ChatColor.RED, "[VaultHunters] Plugin disabled!");
-
     }
 
     // Register commands
@@ -90,10 +91,9 @@ public final class VaultHunters extends JavaPlugin {
 
     // Start the VaultTask
     private void startVaultTask() {
-        ParticleHandler particleHandler = new ParticleHandler(configHandler);  // Initialize the particle handler
-        VaultLootInjector vaultLootInjector = new VaultLootInjector(this, vaultTiersHandler, tierItemsHandler, hologramHandler);  // Initialize the loot injector
+        VaultLootInjector vaultLootInjector = new VaultLootInjector(this, vaultTiersHandler, particleHandler, hologramHandler);
 
-        // Initialize and start the VaultTask
+        // Initialize and start the VaultTask with the updated ParticleHandler
         this.vaultTask = new VaultTask(this, particleHandler, vaultLootInjector, hologramHandler);
         this.vaultTask.startMonitoring();
     }
@@ -176,6 +176,10 @@ public final class VaultHunters extends JavaPlugin {
 
     public PlayerDataManager getPlayerDataManager() {
         return playerDataManager;
+    }
+
+    public ParticleHandler getParticleHandler() {
+        return particleHandler;
     }
 
     public GUIManager getGUIManager() {

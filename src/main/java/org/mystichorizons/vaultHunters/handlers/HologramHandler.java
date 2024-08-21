@@ -10,19 +10,20 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 public class HologramHandler {
 
     private final JavaPlugin plugin;
     private final LangHandler langHandler;
+    private final ConfigHandler configHandler;
     private boolean useDecentHolograms = false;
     private final Map<Location, Hologram> decentHologramsMap = new HashMap<>();
     private final Map<Location, ArmorStand> internalHologramsMap = new HashMap<>();
 
-    public HologramHandler(JavaPlugin plugin, LangHandler langHandler) {
+    public HologramHandler(JavaPlugin plugin, LangHandler langHandler, ConfigHandler configHandler) {
         this.plugin = plugin;
         this.langHandler = langHandler;
+        this.configHandler = configHandler;
         detectHologramPlugins();
     }
 
@@ -46,22 +47,19 @@ public class HologramHandler {
     }
 
     private void createOrUpdateDecentHologram(Location location, String tierName, String cooldownTime) {
-        // Sanitize the location to create a valid hologram name
         String sanitizedLocation = sanitizeLocation(location);
         String hologramName = "vault_hologram_" + sanitizedLocation;
 
-        // Check if the hologram already exists and update it
         Hologram hologram = DHAPI.getHologram(hologramName);
         if (hologram == null) {
-            hologram = DHAPI.createHologram(hologramName, location.add(0, plugin.getConfig().getDouble("vaults.hologram.above-vault", 1.5), 0));
+            hologram = DHAPI.createHologram(hologramName, location.add(0, configHandler.getAboveVault(), 0));
         }
 
-        // Clear existing lines and add new ones
         DHAPI.updateHologram(String.valueOf(hologram));
-        String hoverName = plugin.getConfig().getString("vaults.hologram.hover_name", "%tier_name% Vault").replace("%tier_name%", tierName);
+        String hoverName = configHandler.getHoverName().replace("%tier_name%", tierName);
         DHAPI.addHologramLine(hologram, hoverName);
 
-        if (plugin.getConfig().getBoolean("vaults.hologram.show-cooldown", true)) {
+        if (configHandler.isShowCooldown()) {
             String cooldownMessage = langHandler.formatMessage("vault-hologram.cooldown-format", "time", cooldownTime);
             DHAPI.addHologramLine(hologram, cooldownMessage);
         }
@@ -71,22 +69,19 @@ public class HologramHandler {
     }
 
     private void createOrUpdateInternalHologram(Location location, String tierName, String cooldownTime) {
-        // Retrieve existing hologram or create a new one
         ArmorStand hologram = internalHologramsMap.get(location);
         if (hologram == null) {
-            hologram = location.getWorld().spawn(location.add(0, plugin.getConfig().getDouble("vaults.hologram.above-vault", 1.5), 0), ArmorStand.class);
+            hologram = location.getWorld().spawn(location.add(0, configHandler.getAboveVault(), 0), ArmorStand.class);
             hologram.setGravity(false);
             hologram.setVisible(false);
             internalHologramsMap.put(location, hologram);
         }
 
-        // Update hologram text
-        String hoverName = plugin.getConfig().getString("vaults.hologram.hover_name", "%tier_name% Vault").replace("%tier_name%", tierName);
+        String hoverName = configHandler.getHoverName().replace("%tier_name%", tierName);
         hologram.setCustomName(hoverName);
         hologram.setCustomNameVisible(true);
 
-        // Optionally handle cooldown hologram line
-        if (plugin.getConfig().getBoolean("vaults.hologram.show-cooldown", true)) {
+        if (configHandler.isShowCooldown()) {
             ArmorStand cooldownHologram = location.getWorld().spawn(location.add(0, -0.25, 0), ArmorStand.class);
             cooldownHologram.setCustomName(langHandler.formatMessage("vault-hologram.cooldown-format", "time", cooldownTime));
             cooldownHologram.setCustomNameVisible(true);
@@ -127,6 +122,6 @@ public class HologramHandler {
     }
 
     public boolean isHologramEnabled() {
-        return useDecentHolograms || plugin.getConfig().getBoolean("vaults.hologram.enabled", true);
+        return useDecentHolograms || configHandler.isHologramEnabled();
     }
 }

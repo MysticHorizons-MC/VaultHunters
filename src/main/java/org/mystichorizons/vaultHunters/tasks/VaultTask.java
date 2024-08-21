@@ -6,18 +6,22 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.mystichorizons.vaultHunters.VaultHunters;
 import org.mystichorizons.vaultHunters.handlers.HologramHandler;
 import org.mystichorizons.vaultHunters.handlers.ParticleHandler;
 import org.mystichorizons.vaultHunters.injector.VaultLootInjector;
+import org.mystichorizons.vaultHunters.tables.VaultBlock;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 
-public class VaultTask {
+public class VaultTask implements Listener {
 
     private final VaultHunters plugin;
     private final ParticleHandler particleHandler;
@@ -47,18 +51,19 @@ public class VaultTask {
 
     private void checkAndUpdateVaultsForPlayer(Player player) {
         Location playerLocation = player.getLocation();
+        ItemStack keyItem = player.getInventory().getItemInMainHand(); // Get the item in the player's hand
 
         for (Block block : getNearbyVaultBlocks(playerLocation)) {
             if (block != null && block.getType() == Material.VAULT) {
-                Location blockLocation = block.getLocation();
+                VaultBlock vaultBlock = new VaultBlock(block); // Create a VaultBlock instance
 
                 // Inject loot using the VaultLootInjector on the main thread
                 Bukkit.getScheduler().runTask(plugin, () -> {
-                    boolean lootInjected = vaultLootInjector.injectRandomTierLoot(block, player);
+                    boolean lootInjected = vaultLootInjector.injectRandomTierLoot(vaultBlock, player, keyItem, Material.TRIAL_KEY, Material.OMINOUS_TRIAL_KEY);
 
                     if (lootInjected) {
-                        particleHandler.playParticles(blockLocation); // Trigger particles
-                        hologramHandler.createOrUpdateHologram(blockLocation, "TierName", "CooldownTime"); // Update hologram
+                        particleHandler.playParticles(block.getLocation()); // Trigger particles
+                        hologramHandler.createOrUpdateHologram(block.getLocation(), "TierName", "CooldownTime"); // Update hologram
                     }
                 });
             }
@@ -82,18 +87,13 @@ public class VaultTask {
     }
 
     @EventHandler
-    public void handleBlockBreak(BlockBreakEvent block) {
-        if (block.isCancelled()) {
-            return;
-        }
-
-        if (block.getBlock() == null) {
-            return;
-        }
-
-        if (block.getBlock() != null && block.getBlock().getType() == Material.VAULT) {
+    public void handleBlockBreak(BlockBreakEvent event) {
+        List<Block> vaultBlocks = new ArrayList<>(getNearbyVaultBlocks(event.getBlock().getLocation()) );
+        Block block = event.getBlock();
+        if (block != null && block.getType() == Material.VAULT) {
             // Remove hologram when vault block is broken
-            hologramHandler.removeHologram(block.getBlock().getLocation());
+            hologramHandler.removeHologram(block.getLocation());
+            vaultBlocks.remove(block);
         }
     }
 }
