@@ -5,7 +5,7 @@ api-version: '1.21'
 authors: [ Alphine ]
 description: Allows you to modify how Vaults work in 1.21+ and allows you to add other loot using NBT Data.
 website: https://mystichorizons.net
-softdepend: [ DecentHolograms, NBTAPI ]
+softdepend: [ DecentHolograms, NBTAPI, StarCore ]
 commands:
   vaulthunters:
     description: Main command for VaultHunters plugin.
