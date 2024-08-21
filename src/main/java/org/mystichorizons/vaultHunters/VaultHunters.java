@@ -107,7 +107,7 @@ public final class VaultHunters extends JavaPlugin {
     private void displayBanner() {
         String pluginName = ChatColor.GREEN + "VaultHunters";
         String version = ChatColor.GRAY + "v" + getDescription().getVersion();
-        String author = ChatColor.WHITE + "Author: " + ChatColor.AQUA + "Alphine";
+        String author = ChatColor.WHITE + "Authors: " + ChatColor.AQUA + this.getDescription().getAuthors();
 
         String spacer = " ".repeat(30); // Adjust the number to center the text
 

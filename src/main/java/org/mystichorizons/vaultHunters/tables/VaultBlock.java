@@ -38,12 +38,12 @@ public class VaultBlock {
             }
             generateVaultLoot(playerLoot);
         } else {
-            block.getWorld().createExplosion(block.getLocation(), 0);  // Example: Handle invalid key interaction
+            block.getWorld().createExplosion(block.getLocation(), 0);
         }
     }
 
     private void generateVaultLoot(PlayerLoot playerLoot) {
-        LootTable lootTable = new LootTable(); // Replace with specific vault's loot table
+        LootTable lootTable = new LootTable();
         for (ItemStack item : lootTable.generateLoot()) {
             playerLoot.addLoot(item);
             block.getWorld().dropItemNaturally(block.getLocation(), item);

@@ -75,7 +75,7 @@ public class VaultHuntersCommand implements CommandExecutor {
     private void showInfo(CommandSender sender) {
         if (sender.hasPermission("vaulthunters.info")) {
             sender.sendMessage(ChatColor.GOLD + "VaultHunters Plugin v" + plugin.getDescription().getVersion());
-            sender.sendMessage(ChatColor.GOLD + "Author: " + plugin.getDescription().getAuthors());
+            sender.sendMessage(ChatColor.GOLD + "Authors: " + plugin.getDescription().getAuthors());
         } else {
             sender.sendMessage(langHandler.getMessage("vault-no-permission"));
         }
