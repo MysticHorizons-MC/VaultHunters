@@ -6,7 +6,7 @@
 
     <groupId>org.mystichorizons</groupId>
     <artifactId>VaultHunters</artifactId>
-    <version>1.0.0-alpha.13</version>
+    <version>1.0.0-alpha.14</version>
     <packaging>jar</packaging>
 
     <name>VaultHunters</name>
@@ -122,6 +122,14 @@
             <groupId>com.github.decentsoftware-eu</groupId>
             <artifactId>decentholograms</artifactId>
             <version>2.8.11</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- StarCore API Dependency -->
+        <dependency>
+            <groupId>com.github.StarDevelopmentLLC</groupId>
+            <artifactId>StarCore</artifactId>
+            <version>1.0.0-alpha.38</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
