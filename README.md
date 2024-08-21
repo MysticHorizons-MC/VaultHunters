@@ -156,7 +156,7 @@ Make sure your code follows the project's coding standards and is well-documente
 
 ## License
 
-VaultHunters is licensed under the Apache License 2.0 License. See the [LICENSE](LICENSE) file for more details.
+VaultHunters is licensed under the AGPL-3.0 License. See the [LICENSE](LICENSE) file for more details.
 
 ## Support
 
