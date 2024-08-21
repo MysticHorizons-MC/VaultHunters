@@ -34,9 +34,6 @@ public final class VaultHunters extends JavaPlugin {
             return;
         }
 
-        // Display the banner on load
-        displayBanner();
-
         // Ensure all necessary files are created
         saveDefaultFiles();
 
@@ -62,12 +59,16 @@ public final class VaultHunters extends JavaPlugin {
 
         // Log that the plugin is enabled
         sendConsoleMessage(ChatColor.GREEN, "[VaultHunters] Plugin enabled!");
+
+        // Display the banner after the plugin is enabled
+        displayBanner();
     }
 
     @Override
     public void onDisable() {
         // Perform any necessary cleanup
         sendConsoleMessage(ChatColor.RED, "[VaultHunters] Plugin disabled!");
+
     }
 
     // Register commands
@@ -82,14 +83,13 @@ public final class VaultHunters extends JavaPlugin {
 
     // Register event listeners
     private void registerListeners() {
-        new VaultListener(this);
-        new BypassListener(this);
-        new GUIManager(this);
+        getServer().getPluginManager().registerEvents(new VaultListener(this), this);
+        getServer().getPluginManager().registerEvents(new BypassListener(this), this);
+        getServer().getPluginManager().registerEvents(guiManager, this);
     }
 
     // Start the VaultTask
     private void startVaultTask() {
-        HologramHandler hologramHandler = new HologramHandler(this, langHandler);  // Initialize the hologram handler
         ParticleHandler particleHandler = new ParticleHandler(configHandler);  // Initialize the particle handler
         VaultLootInjector vaultLootInjector = new VaultLootInjector(this, vaultTiersHandler, tierItemsHandler, hologramHandler);  // Initialize the loot injector
 
@@ -106,7 +106,7 @@ public final class VaultHunters extends JavaPlugin {
     // Display a banner in the console on plugin load
     private void displayBanner() {
         String pluginName = ChatColor.GREEN + "VaultHunters";
-        String version = ChatColor.GRAY + "v" + getDescription().getVersion();  // Replace the placeholder with actual version
+        String version = ChatColor.GRAY + "v" + getDescription().getVersion();
         String author = ChatColor.WHITE + "Author: " + ChatColor.AQUA + "Alphine";
 
         String spacer = " ".repeat(30); // Adjust the number to center the text
