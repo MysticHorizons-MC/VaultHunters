@@ -4,7 +4,6 @@ import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Particle.DustOptions;
-import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.util.Random;
 
@@ -17,12 +16,11 @@ public class ParticleHandler {
     }
 
     public void playParticles(Location location) {
-        if (!configHandler.getConfig().getBoolean("options.particles.enabled", true)) {
+        if (!configHandler.isParticlesEnabled()) {
             return;
         }
 
-        YamlConfiguration config = (YamlConfiguration) configHandler.getConfig();
-        String particleConfig = config.getString("options.particles.particle-list[0]");
+        String particleConfig = configHandler.getParticleList().isEmpty() ? null : configHandler.getParticleList().get(0);
 
         Particle particle;
         int amount;
@@ -40,14 +38,12 @@ public class ParticleHandler {
                     float size = parts.length >= 4 ? Float.parseFloat(parts[3]) : 1.0f;
                     dustOptions = new DustOptions(color, size);
                 } else {
-                    // Default to random color if not specified
                     dustOptions = new DustOptions(randomColor(), 1.0f);
                 }
             }
         } else {
-            // Default particle configuration
             particle = Particle.DUST;
-            amount = 10;
+            amount = configHandler.getParticleLoop(); // Default to loop amount if not specified
             dustOptions = new DustOptions(randomColor(), 1.0f);
         }
 
