@@ -7,8 +7,10 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.ItemStack;
 import org.mystichorizons.vaultHunters.VaultHunters;
 import org.mystichorizons.vaultHunters.injector.VaultLootInjector;
+import org.mystichorizons.vaultHunters.tables.VaultBlock;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -41,45 +43,40 @@ public class VaultListener implements Listener {
         Player player = event.getPlayer();
         Block block = event.getClickedBlock();
 
-        if (block != null && isVaultBlock(block)) {
+        if (block != null) {
             handleVaultInteraction(player, block);
         }
     }
 
     private void handleVaultInteraction(Player player, Block block) {
+        VaultBlock vaultBlock = new VaultBlock(block); // Create a VaultBlock instance
+        ItemStack keyItem = player.getInventory().getItemInMainHand(); // Get the item in the player's hand
+
+        // Check if the key is valid and handle the interaction
+        if (vaultBlock.isValidKey(keyItem, Material.TRIAL_KEY, Material.OMINOUS_TRIAL_KEY)) {
+            vaultBlock.handleVaultBlockInteraction(null, keyItem, Material.TRIAL_KEY, Material.OMINOUS_TRIAL_KEY);
+
+            // If valid, perform the vault block interaction
+            if (vaultLootInjector.injectRandomTierLoot(block, player)) {
+                handleCooldown(player, block);
+            }
+        } else {
+            // Handle invalid key interaction
+            player.sendMessage("This key is not valid for the vault!");
+        }
+    }
+
+    private void handleCooldown(Player player, Block block) {
         UUID playerUUID = player.getUniqueId();
         long currentTime = System.currentTimeMillis();
         String cooldownType = plugin.getConfigHandler().getConfig().getString("vaults.cooldown-type", "PER_PLAYER");
 
-        // First, drop any existing loot from the NBT data
-        vaultLootInjector.dropLootFromNBT(block, player);
+        Map<Block, Long> cooldowns = "PER_PLAYER".equalsIgnoreCase(cooldownType)
+                ? playerCooldowns.computeIfAbsent(playerUUID, k -> new HashMap<>())
+                : globalCooldowns;
 
-        if ("PER_PLAYER".equalsIgnoreCase(cooldownType)) {
-            handlePlayerCooldown(player, block, playerUUID, currentTime);
-        } else if ("GLOBAL".equalsIgnoreCase(cooldownType)) {
-            handleGlobalCooldown(player, block, currentTime);
-        }
-    }
-
-    private void handlePlayerCooldown(Player player, Block block, UUID playerUUID, long currentTime) {
-        Map<Block, Long> cooldowns = playerCooldowns.computeIfAbsent(playerUUID, k -> new HashMap<>());
-        if (isOnCooldown(cooldowns, block, currentTime)) {
-            long remainingTime = getRemainingCooldownTime(cooldowns, block, currentTime);
-            player.sendMessage(plugin.getLangHandler().formatMessage("vault-on-cooldown", "time", formatTime(remainingTime)));
-        } else if (vaultLootInjector.injectRandomTierLoot(block)) {
-            long cooldownTime = plugin.getConfigHandler().getCooldownTimeMillis();
-            cooldowns.put(block, currentTime + cooldownTime);
-        }
-    }
-
-    private void handleGlobalCooldown(Player player, Block block, long currentTime) {
-        if (isOnCooldown(globalCooldowns, block, currentTime)) {
-            long remainingTime = getRemainingCooldownTime(globalCooldowns, block, currentTime);
-            player.sendMessage(plugin.getLangHandler().formatMessage("vault-on-cooldown", "time", formatTime(remainingTime)));
-        } else if (vaultLootInjector.injectRandomTierLoot(block)) {
-            long cooldownTime = plugin.getConfigHandler().getCooldownTimeMillis();
-            globalCooldowns.put(block, currentTime + cooldownTime);
-        }
+        long cooldownTime = plugin.getConfigHandler().getCooldownTimeMillis();
+        cooldowns.put(block, currentTime + cooldownTime);
     }
 
     private boolean isOnCooldown(Map<Block, Long> cooldowns, Block block, long currentTime) {
@@ -97,9 +94,5 @@ public class VaultListener implements Listener {
         long hours = minutes / 60;
         minutes = minutes % 60;
         return String.format("%02d:%02d:%02d", hours, minutes, seconds);
-    }
-
-    private boolean isVaultBlock(Block block) {
-        return block.getType() == Material.VAULT;
     }
 }
