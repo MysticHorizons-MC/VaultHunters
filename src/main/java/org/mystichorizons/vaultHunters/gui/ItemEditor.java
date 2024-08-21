@@ -3,6 +3,7 @@ package org.mystichorizons.vaultHunters.gui;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
@@ -11,16 +12,15 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.mystichorizons.vaultHunters.VaultHunters;
 import org.mystichorizons.vaultHunters.handlers.LangHandler;
 
-public class ItemEditor {
+public class ItemEditor extends GUIManager {
 
-    private final VaultHunters plugin;
     private final LangHandler langHandler;
     private final ItemStack itemToEdit;
     private final String tierName;
     private final int itemIndex;
 
     public ItemEditor(VaultHunters plugin, ItemStack itemToEdit, String tierName) {
-        this.plugin = plugin;
+        super(plugin);
         this.langHandler = plugin.getLangHandler();
         this.itemToEdit = itemToEdit;
         this.tierName = tierName;
@@ -55,39 +55,29 @@ public class ItemEditor {
         // Set the paper item in the first slot of the anvil
         anvil.setItem(0, paper);
 
-        // Register the GUI with the GUIManager for handling
-        plugin.getGUIManager().registerGUI("ItemEditor", anvil);
-
-        // Open the anvil inventory for the player
-        player.openInventory(anvil);
+        // Register and open the GUI using inherited methods
+        registerGUI("ItemEditor", anvil);
+        openGUI(player, "ItemEditor");
     }
 
+    @EventHandler
     public void handleAnvilClick(InventoryClickEvent event) {
-        // Check if the inventory clicked is an anvil
-        if (event.getInventory().getType() == InventoryType.ANVIL) {
-            // Check if the click is on the result slot (index 2)
-            if (event.getSlot() == 2) {
-                ItemStack resultItem = event.getCurrentItem();
-                if (resultItem != null && resultItem.getType() == Material.PAPER && resultItem.hasItemMeta()) {
-                    try {
-                        String displayName = resultItem.getItemMeta().getDisplayName();
-                        if (displayName != null) {
-                            double newChance = Double.parseDouble(displayName);
+        if (event.getInventory().getType() == InventoryType.ANVIL && event.getSlot() == 2) {
+            ItemStack resultItem = event.getCurrentItem();
+            if (resultItem != null && resultItem.getType() == Material.PAPER && resultItem.hasItemMeta()) {
+                try {
+                    String displayName = resultItem.getItemMeta().getDisplayName();
+                    double newChance = Double.parseDouble(displayName);
 
-                            // Update the item's chance in the vault tier
-                            plugin.getTierItemsHandler().editTierItem(tierName, itemIndex, itemToEdit, newChance);
-                            event.getWhoClicked().sendMessage(langHandler.getMessage("item-editor-save"));
-                        } else {
-                            throw new NumberFormatException();
-                        }
-                    } catch (NumberFormatException e) {
-                        event.getWhoClicked().sendMessage(langHandler.getMessage("item-editor-invalid-chance"));
-                    }
-
-                    // Cancel the event and close the inventory after saving
-                    event.setCancelled(true);
-                    event.getWhoClicked().closeInventory();
+                    // Update the item's chance in the vault tier
+                    plugin.getTierItemsHandler().editTierItem(tierName, itemIndex, itemToEdit, newChance);
+                    event.getWhoClicked().sendMessage(langHandler.getMessage("item-editor-save"));
+                } catch (NumberFormatException e) {
+                    event.getWhoClicked().sendMessage(langHandler.getMessage("item-editor-invalid-chance"));
                 }
+
+                event.setCancelled(true);
+                event.getWhoClicked().closeInventory();
             }
         }
     }

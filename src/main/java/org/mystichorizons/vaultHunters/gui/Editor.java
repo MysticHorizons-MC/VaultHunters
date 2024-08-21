@@ -4,6 +4,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -13,13 +14,12 @@ import org.mystichorizons.vaultHunters.handlers.VaultTiersHandler;
 
 import java.io.File;
 
-public class Editor {
+public class Editor extends GUIManager {
 
-    private final VaultHunters plugin;
     private final LangHandler langHandler;
 
     public Editor(VaultHunters plugin) {
-        this.plugin = plugin;
+        super(plugin);
         this.langHandler = plugin.getLangHandler();
     }
 
@@ -39,10 +39,12 @@ public class Editor {
         editorMenu.setItem(48, new GUI(plugin).createItem(Material.NAME_TAG, langHandler.getMessage("vault-gui-edit-hologram")));
         editorMenu.setItem(49, new GUI(plugin).createItem(Material.CHEST, langHandler.getMessage("vault-gui-add-loot")));
 
-        plugin.getGUIManager().registerGUI("VaultTierEditor", editorMenu);
-        player.openInventory(editorMenu);
+        // Register and open the GUI using inherited methods
+        registerGUI("VaultTierEditor", editorMenu);
+        openGUI(player, "VaultTierEditor");
     }
 
+    @EventHandler
     public void handleInventoryClick(InventoryClickEvent event, String tierName) {
         Player player = (Player) event.getWhoClicked();
         ItemStack clickedItem = event.getCurrentItem();
@@ -79,6 +81,7 @@ public class Editor {
 
     private void handleBarrierClick(Player player, String tierName) {
         VaultTiersHandler vaultTiersHandler = plugin.getVaultTiersHandler();
+
 
         if (!vaultTiersHandler.isTierSaved(tierName)) {
             vaultTiersHandler.deleteTier(tierName);

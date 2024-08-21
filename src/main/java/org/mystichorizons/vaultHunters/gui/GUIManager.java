@@ -13,9 +13,9 @@ import org.mystichorizons.vaultHunters.VaultHunters;
 import java.util.HashMap;
 import java.util.Map;
 
-public class GUIManager {
+public class GUIManager implements Listener {
 
-    private final VaultHunters plugin;
+    public final VaultHunters plugin;
     private final Map<String, Inventory> registeredGUIs;
 
     public GUIManager(VaultHunters plugin) {
@@ -54,6 +54,7 @@ public class GUIManager {
         }
     }
 
+    @EventHandler
     // Handle inventory click events
     public void handleInventoryClick(InventoryClickEvent event) {
         Inventory clickedInventory = event.getClickedInventory();
@@ -66,7 +67,6 @@ public class GUIManager {
             String guiName = getGUIName(clickedInventory);
             if (guiName != null) {
                 plugin.getLogger().info(player.getName() + " clicked on slot " + slot + " in GUI " + guiName);
-                // Add your custom logic here
             }
         }
     }

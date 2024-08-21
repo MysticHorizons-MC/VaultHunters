@@ -4,6 +4,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
@@ -19,13 +20,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.ArrayList;
 
-public class LootEditor {
+public class LootEditor extends GUIManager {
 
-    private final VaultHunters plugin;
     private final LangHandler langHandler;
 
     public LootEditor(VaultHunters plugin) {
-        this.plugin = plugin;
+        super(plugin);
         this.langHandler = plugin.getLangHandler();
     }
 
@@ -51,8 +51,9 @@ public class LootEditor {
             lootEditor.setItem(i, item);
         }
 
-        plugin.getGUIManager().registerGUI("LootEditor", lootEditor);
-        player.openInventory(lootEditor);
+        // Register and open the GUI using inherited methods
+        registerGUI("LootEditor", lootEditor);
+        openGUI(player, "LootEditor");
     }
 
     private ItemStack createGlassPane() {
@@ -75,6 +76,7 @@ public class LootEditor {
         return saveButton;
     }
 
+    @EventHandler
     public void handleInventoryClick(InventoryClickEvent event, String tierName) {
         Player player = (Player) event.getWhoClicked();
         int slot = event.getSlot();
