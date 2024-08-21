@@ -5,6 +5,8 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.mystichorizons.vaultHunters.VaultHunters;
 import org.mystichorizons.vaultHunters.handlers.HologramHandler;
@@ -52,7 +54,7 @@ public class VaultTask {
 
                 // Inject loot using the VaultLootInjector on the main thread
                 Bukkit.getScheduler().runTask(plugin, () -> {
-                    boolean lootInjected = vaultLootInjector.injectRandomTierLoot(block);
+                    boolean lootInjected = vaultLootInjector.injectRandomTierLoot(block, player);
 
                     if (lootInjected) {
                         particleHandler.playParticles(blockLocation); // Trigger particles
@@ -79,10 +81,19 @@ public class VaultTask {
         return vaultBlocks;
     }
 
-    public void handleBlockBreak(Block block) {
-        if (block.getType() == Material.VAULT) {
+    @EventHandler
+    public void handleBlockBreak(BlockBreakEvent block) {
+        if (block.isCancelled()) {
+            return;
+        }
+
+        if (block.getBlock() == null) {
+            return;
+        }
+
+        if (block.getBlock() != null && block.getBlock().getType() == Material.VAULT) {
             // Remove hologram when vault block is broken
-            hologramHandler.removeHologram(block.getLocation());
+            hologramHandler.removeHologram(block.getBlock().getLocation());
         }
     }
 }
