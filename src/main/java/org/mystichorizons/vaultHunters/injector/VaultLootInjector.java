@@ -81,6 +81,7 @@ public class VaultLootInjector {
                 plugin.getLogger().info("[ADMIN] Injecting loot into vault block...");
                 lootItems.forEach(item -> vaultBlock.getBlock().getWorld().dropItemNaturally(vaultBlock.getBlock().getLocation(), item));
                 setVaultState(vaultBlock.getBlock(), Vault.State.EJECTING);
+                plugin.getLogger().info("[ADMIN] Loot injected successfully.");
             } else {
                 plugin.getLogger().warning("[ADMIN] Vault block is not lootable or does not support loot tables.");
                 return false;
