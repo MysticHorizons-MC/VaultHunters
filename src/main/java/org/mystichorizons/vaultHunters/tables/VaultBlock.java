@@ -2,7 +2,7 @@ package org.mystichorizons.vaultHunters.tables;
 
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.entity.Player;
+
 import org.bukkit.inventory.ItemStack;
 
 public class VaultBlock {
@@ -29,17 +29,6 @@ public class VaultBlock {
     public boolean isValidKey(ItemStack key, Material trialKeyMaterial, Material ominousTrialKeyMaterial) {
         Material keyType = key.getType();
         return keyType == trialKeyMaterial || keyType == ominousTrialKeyMaterial;
-    }
-
-    public void handleVaultBlockInteraction(PlayerLoot playerLoot, ItemStack key, Material trialKeyMaterial, Material ominousTrialKeyMaterial) {
-        if (isValidKey(key, trialKeyMaterial, ominousTrialKeyMaterial)) {
-            if (key.getType() == ominousTrialKeyMaterial) {
-                setOminous(true);
-            }
-            generateVaultLoot(playerLoot);
-        } else {
-            block.getWorld().createExplosion(block.getLocation(), 0);
-        }
     }
 
     private void generateVaultLoot(PlayerLoot playerLoot) {
