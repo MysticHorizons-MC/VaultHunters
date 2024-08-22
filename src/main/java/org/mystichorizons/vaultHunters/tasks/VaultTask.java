@@ -50,6 +50,7 @@ public class VaultTask implements Listener {
     }
 
     private void checkAndUpdateVaultsForPlayer(Player player) {
+        plugin.getLogger().info("[ADMIN] Checking and updating vaults for player " + player.getName());
         Location playerLocation = player.getLocation();
         ItemStack keyItem = player.getInventory().getItemInMainHand(); // Get the item in the player's hand
 
@@ -59,7 +60,8 @@ public class VaultTask implements Listener {
 
                 // Inject loot using the VaultLootInjector on the main thread
                 Bukkit.getScheduler().runTask(plugin, () -> {
-                    boolean lootInjected = vaultLootInjector.injectRandomTierLoot(vaultBlock, player, keyItem, Material.TRIAL_KEY, Material.OMINOUS_TRIAL_KEY);
+                    boolean lootInjected = vaultLootInjector.injectRandomTierLoot(vaultBlock, player);
+                    plugin.getLogger().info("[ADMIN] Player " + player.getName() + " interacted with a vault from VaultTask.");
 
                     if (lootInjected) {
                         particleHandler.playParticles(block.getLocation()); // Trigger particles
@@ -71,6 +73,7 @@ public class VaultTask implements Listener {
     }
 
     private Set<Block> getNearbyVaultBlocks(Location location) {
+        plugin.getLogger().info("[ADMIN] Getting nearby vault blocks for location " + location.toString());
         Set<Block> vaultBlocks = new HashSet<>();
         int radius = (int) Math.sqrt(rangeSquared);
         for (int x = -radius; x <= radius; x++) {
@@ -79,6 +82,7 @@ public class VaultTask implements Listener {
                     Block block = location.getWorld().getBlockAt(location.getBlockX() + x, location.getBlockY() + y, location.getBlockZ() + z);
                     if (block.getType() == Material.VAULT) {
                         vaultBlocks.add(block);
+                        plugin.getLogger().info("[ADMIN] Found vault block at " + block.getLocation().toString());
                     }
                 }
             }
@@ -88,12 +92,14 @@ public class VaultTask implements Listener {
 
     @EventHandler
     public void handleBlockBreak(BlockBreakEvent event) {
+        plugin.getLogger().info("[ADMIN] Handling block break event...");
         List<Block> vaultBlocks = new ArrayList<>(getNearbyVaultBlocks(event.getBlock().getLocation()) );
         Block block = event.getBlock();
         if (block != null && block.getType() == Material.VAULT) {
             // Remove hologram when vault block is broken
             hologramHandler.removeHologram(block.getLocation());
             vaultBlocks.remove(block);
+            plugin.getLogger().info("[ADMIN] Removed hologram for vault block at " + block.getLocation().toString());
         }
     }
 }

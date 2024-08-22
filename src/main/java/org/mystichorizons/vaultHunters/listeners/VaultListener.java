@@ -54,13 +54,17 @@ public class VaultListener implements Listener {
 
         // Check if the key is valid using the VaultBlock class
         if (vaultBlock.isValidKey(keyItem, Material.TRIAL_KEY, Material.OMINOUS_TRIAL_KEY)) {
+            plugin.getLogger().info("[ADMIN] Player " + player.getName() + " interacted with a vault.");
             // If the key is valid, proceed to inject loot and handle the interaction
-            boolean lootInjected = vaultLootInjector.injectRandomTierLoot(vaultBlock, player, keyItem, Material.TRIAL_KEY, Material.OMINOUS_TRIAL_KEY);
+            boolean lootInjected = vaultLootInjector.injectRandomTierLoot(vaultBlock, player);
 
             if (lootInjected) {
+                plugin.getLogger().info("[ADMIN] Loot injected into the vault.");
                 handleCooldown(player, block);
+                plugin.getLogger().info("[ADMIN] Cooldown handled.");
             } else {
                 player.sendMessage("Failed to inject loot into the vault.");
+                plugin.getLogger().info("[ADMIN] Failed to inject loot into the vault.");
             }
         } else {
             // Handle invalid key interaction
@@ -69,9 +73,11 @@ public class VaultListener implements Listener {
     }
 
     private void handleCooldown(Player player, Block block) {
+        plugin.getLogger().info("[ADMIN] Handling cooldown...");
         UUID playerUUID = player.getUniqueId();
         long currentTime = System.currentTimeMillis();
         String cooldownType = plugin.getConfigHandler().getConfig().getString("vaults.cooldown-type", "PER_PLAYER");
+        plugin.getLogger().info("[ADMIN] Cooldown type: " + cooldownType);
 
         Map<Block, Long> cooldowns = "PER_PLAYER".equalsIgnoreCase(cooldownType)
                 ? playerCooldowns.computeIfAbsent(playerUUID, k -> new HashMap<>())
@@ -79,7 +85,10 @@ public class VaultListener implements Listener {
 
         long cooldownTime = plugin.getConfigHandler().getCooldownTimeMillis();
         cooldowns.put(block, currentTime + cooldownTime);
+        plugin.getLogger().info("[ADMIN] Cooldown set for " + cooldownTime + "ms.");
     }
+
+    // TODO: Methods below are to be removed.
 
     private boolean isOnCooldown(Map<Block, Long> cooldowns, Block block, long currentTime) {
         return cooldowns.getOrDefault(block, 0L) > currentTime;

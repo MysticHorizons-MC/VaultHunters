@@ -54,14 +54,8 @@ public class VaultLootInjector {
         }
     }
 
-    public boolean injectRandomTierLoot(VaultBlock vaultBlock, Player player, ItemStack key, Material trialKeyMaterial, Material ominousTrialKeyMaterial) {
+    public boolean injectRandomTierLoot(VaultBlock vaultBlock, Player player) {
         UUID playerId = player.getUniqueId();
-
-        // Validate the key using VaultBlock
-        if (!vaultBlock.isValidKey(key, trialKeyMaterial, ominousTrialKeyMaterial)) {
-            player.sendMessage("Invalid key used! You cannot loot this vault.");
-            return false;
-        }
 
         // Determine the current tier of the vault, if any
         VaultTiersHandler.VaultTier currentTier = getCurrentVaultTier(vaultBlock.getBlock());
@@ -83,11 +77,12 @@ public class VaultLootInjector {
             LootTable lootTable = createLootTableForTier(newTier);
             List<ItemStack> lootItems = lootTable.generateLoot();
 
-            if (vaultBlock.getBlock().getState() instanceof Lootable) {
+            if (vaultBlock.getBlock().getState() instanceof LootTable) {
+                plugin.getLogger().info("[ADMIN] Injecting loot into vault block...");
                 lootItems.forEach(item -> vaultBlock.getBlock().getWorld().dropItemNaturally(vaultBlock.getBlock().getLocation(), item));
                 setVaultState(vaultBlock.getBlock(), Vault.State.EJECTING);
             } else {
-                plugin.getLogger().warning("Vault block is not lootable or does not support loot tables.");
+                plugin.getLogger().warning("[ADMIN] Vault block is not lootable or does not support loot tables.");
                 return false;
             }
 
@@ -108,11 +103,15 @@ public class VaultLootInjector {
     }
 
     private LootTable createLootTableForTier(VaultTiersHandler.VaultTier tier) {
+        plugin.getLogger().info("[ADMIN] Creating loot table for tier: " + tier.getName());
         LootTable lootTable = new LootTable();
-        List<LootItem> tierItems = (List<LootItem>) vaultTiersHandler.loadLootTable(tier.getName());
+        LootTable tierLootTable = vaultTiersHandler.loadLootTable(tier.getName());
 
-        for (LootItem tierItem : tierItems) {
-            lootTable.addLootItem(new LootItem(tierItem.getItem(), tierItem.getChance(), tierItem.getMinQuantity(), tierItem.getMaxQuantity()));
+        if (tierLootTable != null) {
+            for (LootItem tierItem : tierLootTable.getLootItems()) {
+                lootTable.addLootItem(new LootItem(tierItem.getItem(), tierItem.getChance(), tierItem.getMinQuantity(), tierItem.getMaxQuantity()));
+                plugin.getLogger().info("[ADMIN] Added loot item to loot table: " + tierItem.getItem().getType().name());
+            }
         }
 
         return lootTable;
@@ -130,14 +129,16 @@ public class VaultLootInjector {
 
     private void setVaultState(Block vaultBlock, Vault.State state) {
         if (vaultBlock.getBlockData() instanceof Vault vault) {
+            plugin.getLogger().info("[ADMIN] Setting vault block state to " + state.name());
             vault.setTrialSpawnerState(state);
             vaultBlock.setBlockData(vault);
         } else {
-            plugin.getLogger().warning("Vault block is not of type Vault.");
+            plugin.getLogger().warning("[ADMIN] Vault block is not of type Vault.");
         }
     }
 
     private void startCooldown(Block vaultBlock, UUID playerId, VaultTiersHandler.VaultTier currentTier) {
+        plugin.getLogger().info("[ADMIN] Starting cooldown for player " + playerId + " on vault block " + vaultBlock.getLocation().toString());
         long cooldownTimeMillis = plugin.getConfigHandler().getCooldownTimeMillis();
         long cooldownEndTime = System.currentTimeMillis() + cooldownTimeMillis;
 
@@ -159,7 +160,7 @@ public class VaultLootInjector {
                 if (isPlayerNearVault(vaultBlock, playerId)) {
                     Player nearbyPlayer = plugin.getServer().getPlayer(playerId);
                     if (nearbyPlayer != null) {
-                        injectRandomTierLoot(new VaultBlock(vaultBlock), nearbyPlayer, nearbyPlayer.getInventory().getItemInMainHand(), Material.TRIAL_KEY, Material.OMINOUS_TRIAL_KEY);
+                        injectRandomTierLoot(new VaultBlock(vaultBlock), nearbyPlayer);
                     }
                 }
             }
@@ -251,8 +252,11 @@ public class VaultLootInjector {
 
     private void assignTierToVault(Block vaultBlock, VaultTiersHandler.VaultTier tier) {
         if (!(vaultBlock.getState() instanceof TileState)) {
+            plugin.getLogger().warning("[ADMIN] Vault block is not a TileState.");
             return;
         }
+
+        plugin.getLogger().info("[ADMIN] Assigning tier " + tier.getName() + " to vault block.");
 
         TileState tileState = (TileState) vaultBlock.getState();
         PersistentDataContainer dataContainer = tileState.getPersistentDataContainer();
