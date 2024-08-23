@@ -235,16 +235,6 @@ public class VaultTiersHandler {
             return numberOfItems;
         }
 
-        public int getMinItems() {
-            String[] range = numberOfItems.split("-");
-            return Integer.parseInt(range[0]);
-        }
-
-        public int getMaxItems() {
-            String[] range = numberOfItems.split("-");
-            return Integer.parseInt(range[1]);
-        }
-
         public LootTable getLootTable() {
             return lootTable;
         }
